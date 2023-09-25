@@ -1,0 +1,171 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+// model User {
+//   id                   Int      @id @default(autoincrement())
+//   email                String
+//   username             String?
+//   password             String
+//   verify               Boolean  @default(false)
+//   Token                Token[]
+//   name                 String?
+//   phonenumber          String?
+//   createdAt            DateTime? @default(now())
+//   refresh_token        String?
+//   forgotpassword_token String?
+//   role                 Int?
+//   fK_Role              Role?    @relation(fields: [role], references: [id])
+
+//   // roleId               Role? @relation(fields: [id], references: [id])
+// }
+
+// model Role {
+//   id        Int      @id @default(autoincrement())
+//   name      String?
+//   createdAt DateTime
+//   updatedAt DateTime
+//   User      User[]
+// }
+
+model User {
+  id                   Int          @id @default(autoincrement())
+  email                String       @unique
+  username             String?      @unique
+  password             String
+  verify               Boolean      @default(false)
+  Token                Token[]
+  name                 String?
+  phonenumber          String?
+  image                String?
+  createdAt            DateTime     @default(now())
+  updateAt             DateTime     @default(now())
+  dateOfBirth          DateTime?
+  sex                  Boolean?
+  refresh_token        String?
+  forgotpassword_token String? @db.VarChar(300)
+  role                 Int?
+  fK_Role              Role?        @relation(fields: [role], references: [id])
+  cart                 CartSchema[]
+  // roleId               Role? @relation(fields: [id], references: [id])
+}
+
+model Role {
+  id        Int      @id @default(autoincrement())
+  name      String?
+  createdAt DateTime
+  updatedAt DateTime
+  User      User[]
+}
+
+model Token {
+  id           Int      @id @default(autoincrement())
+  userid       Int      
+  fk_userTOken User     @relation(fields: [userid], references: [id])
+  token        String
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @default(now())
+}
+
+model Product {
+  id           Int            @id @default(autoincrement())
+  name         String?
+  price        Int?
+  rate         Int?
+  pricesale    Int?
+  sellingPrice Int?
+  discount     Int?
+  soldcount    Int?
+  quantity     Int?
+  description  String?
+  status       String?
+  date         DateTime?      @default(now())
+  productId    Int?
+  createdAt    DateTime?      @default(now())
+  updatedAt    DateTime?      @default(now())
+  categoryID   Int?
+  fK_category  Category?      @relation(fields: [categoryID], references: [id])
+  OrderDetail  OrderDetail[]
+  ProductImage ProductImage[]   
+  itemCarts    ItemCart[]
+}
+
+
+
+model Category {
+  id        Int       @id @default(autoincrement())
+  name      String?
+  date      DateTime? @default(now())
+  updatedAt DateTime? @default(now())
+  createdAt DateTime? @default(now())
+  products  Product[]
+}
+
+model ItemCart {
+  id         Int        @id @default(autoincrement())
+  product    Product    @relation(fields: [productid], references: [id])
+  productid  Int
+  cartschema CartSchema @relation(fields: [cartid], references: [id])
+  cartid     Int
+  quantity   Int?       @default(1)
+  price      Int?
+  total      Int?
+  createdAt  DateTime   @default(now())
+  updatedAt  DateTime?  @default(now())
+}
+
+model CartSchema {
+  id       Int        @id @default(autoincrement())
+  user     User       @relation(fields: [userId], references: [id])
+  userId   Int
+  item     ItemCart[]
+  subtotal Int
+}
+
+model ProductImage {
+  id               Int      @id @default(autoincrement())
+  url              String?
+  idproduct        Int?
+  fK_propductImage Product? @relation(fields: [idproduct],  references: [id], onDelete: Cascade)
+}
+
+model Order {
+  id          Int           @id @default(autoincrement())
+  name        String?
+  fullName    String?
+  phone       Int?
+  address     String?
+  status      String?
+  totalPrice  Int?
+  coupon      String?
+  createdAt   DateTime?     @default(now())
+  updatedAt   DateTime?     @default(now())
+  OrderDetail OrderDetail[]
+}
+
+model OrderDetail {
+  id              Int       @id @default(autoincrement())
+  productId       Int?
+  orderId         Int?
+  price           Int?
+  quantity        Int?
+  createdAt       DateTime? @default(now())
+  updatedAt       DateTime? @default(now())
+  fK_order        Order?    @relation(fields: [orderId], references: [id])
+  fK_productOrder Product?  @relation(fields: [productId], references: [id])
+}
+
+model discount {
+  id         Int     @id @default(autoincrement())
+  code       String?
+  quatity    Int?
+  limit_code Int?
+}
